@@ -7,10 +7,12 @@ import 'lifecycle.dart';
 class InstanceInfo {
   final bool? isPermanent;
   final bool? isSingleton;
+
   bool get isCreate => !isSingleton!;
   final bool isRegistered;
   final bool isPrepared;
   final bool? isInit;
+
   const InstanceInfo({
     required this.isPermanent,
     required this.isSingleton,
@@ -305,6 +307,18 @@ class GetInstance {
       // ignore: lines_longer_than_80_chars
       throw '"$S" not found. You need to call "Get.put($S())" or "Get.lazyPut(()=>$S())"';
     }
+  }
+
+  List<S> findAll<S>() {
+    final key = S.toString();
+    final list = _singl.entries
+        .where((element) => element.key.contains(key))
+        .map((e) => e.value)
+        .toList();
+    return list
+        .where((element) => element.isInit)
+        .map((e) => e.getDependency() as S)
+        .toList();
   }
 
   /// Generates the key based on [type] (and optionally a [name])
